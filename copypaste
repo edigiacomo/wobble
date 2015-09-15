@@ -3,6 +3,7 @@
 
 import argparse
 import os
+import re
 
 def generate(srcdir, destdir, args):
     """
@@ -10,6 +11,8 @@ def generate(srcdir, destdir, args):
     args
     """
     if args.namespace:
+        decl_namespace = 'namespace ' + re.sub(r'(\S)::', r'\1 {\nnamespace ', args.namespace)
+        decl_namespace = decl_namespace.encode("utf-8")
         dest_namespace = args.namespace.encode("utf-8")
         dest_const = args.namespace.upper().replace("::", "_").encode("utf-8")
 
@@ -29,8 +32,11 @@ def generate(srcdir, destdir, args):
 
             # Replace namespace and const names
             if args.namespace:
+                buf = buf.replace(b"using namespace wobble", b"using namespace " + dest_namespace)
+                buf = buf.replace(b"namespace wobble", decl_namespace)
                 buf = buf.replace(b"wobble", dest_namespace)
                 buf = buf.replace(b"wobble".upper(), dest_const)
+                buf = (b"}\n"*(dest_namespace.count(b"::")+1)).join(buf.rsplit(b"}\n", 1))
 
             with open(os.path.join(destpath, fn), "wb") as fd:
                 fd.write(buf)
