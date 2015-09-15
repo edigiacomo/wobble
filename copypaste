@@ -11,7 +11,7 @@ def generate(srcdir, destdir, args):
     """
     if args.namespace:
         dest_namespace = args.namespace.encode("utf-8")
-        dest_const = args.namespace.upper().replace("::", "-").encode("utf-8")
+        dest_const = args.namespace.upper().replace("::", "_").encode("utf-8")
 
     for root, dirnames, filenames in os.walk(srcdir):
         if args.subdir:
